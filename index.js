@@ -60,6 +60,14 @@ async function run() {
 			const result = await toyCollection.findOne(query);
 			res.send(result);
 		});
+
+		// Get my toys
+		app.get("/myToys/:sellerUid", async (req, res) => {
+			const sellerUid = req.params.sellerUid;
+			const query = { 'seller.sellerUid': sellerUid };
+			const result = await toyCollection.find(query).toArray();
+			res.send(result);
+		});
 	} finally {
 		// Ensures that the client will close when you finish/error
 		// await client.close();
