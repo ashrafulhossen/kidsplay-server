@@ -47,6 +47,12 @@ async function run() {
 			console.log(result);
 		});
 
+		// Get all toys
+		app.get("/allToys", async (req, res) => {
+			const result = await toyCollection.find().toArray();
+			res.send(result);
+		});
+
 		
 	} finally {
 		// Ensures that the client will close when you finish/error
