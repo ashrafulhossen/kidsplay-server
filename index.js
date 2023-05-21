@@ -68,6 +68,14 @@ async function run() {
 			const result = await toyCollection.find(query).toArray();
 			res.send(result);
 		});
+
+		// delete toy 
+		app.delete("/myToys/:_id/delete", async (req, res) => {
+			const _id = req.params._id;
+			const query = {_id: new ObjectId(_id)};
+			const result = await toyCollection.deleteOne(query);
+			res.send(result);
+		})
 	} finally {
 		// Ensures that the client will close when you finish/error
 		// await client.close();
