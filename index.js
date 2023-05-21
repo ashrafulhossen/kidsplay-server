@@ -53,7 +53,13 @@ async function run() {
 			res.send(result);
 		});
 
-		
+		// Get a single toy
+		app.get("/toy/:_id", async (req, res) => {
+			const _id = req.params._id;
+			const query = { _id: new ObjectId(_id) };
+			const result = await toyCollection.findOne(query);
+			res.send(result);
+		});
 	} finally {
 		// Ensures that the client will close when you finish/error
 		// await client.close();
