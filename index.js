@@ -33,20 +33,7 @@ const toyCollection = client.db("toysDB").collection("toy");
 async function run() {
 	try {
 		// Connect the client to the server	(optional starting in v4.7)
-		await client.connect();
-		// Send a ping to confirm a successful connection
-		await client.db("admin").command({ ping: 1 });
-		console.log(
-			"Pinged your deployment. You successfully connected to MongoDB!"
-		);
-
-		// Add a toy
-		app.post("/toys/add", async (req, res) => {
-			const toy = req.body;
-			const result = await toyCollection.insertOne(toy);
-			console.log(result);
-		});
-
+		client.connect();
 		// Get all toys
 		app.get("/allToys", async (req, res) => {
 			const result = await toyCollection.find().toArray();
@@ -64,18 +51,52 @@ async function run() {
 		// Get my toys
 		app.get("/myToys/:sellerUid", async (req, res) => {
 			const sellerUid = req.params.sellerUid;
-			const query = { 'seller.sellerUid': sellerUid };
+			const query = { "seller.sellerUid": sellerUid };
 			const result = await toyCollection.find(query).toArray();
 			res.send(result);
 		});
 
-		// delete toy 
+		// Add a toy
+		app.post("/toys/add", async (req, res) => {
+			const toy = req.body;
+			const result = await toyCollection.insertOne(toy);
+			res.send(result);
+		});
+
+		// update toy
+		app.put("/myToys/:_id/edit", async (req, res) => {
+			const _id = req.params._id;
+			const toy = req.body;
+			const updatedData = {};
+			if (toy?.price) {
+				updatedData.price = toy.price;
+			}
+			if (toy?.quantity) {
+				updatedData.quantity = toy.quantity;
+			}
+			if (toy?.details) {
+				updatedData.details = toy.details;
+			}
+			const filter = { _id: new ObjectId(_id) };
+			const result = await toyCollection.updateOne(filter, {
+				$set: updatedData,
+			});
+			res.send(result);
+			console.log(result);
+		});
+
+		// delete toy
 		app.delete("/myToys/:_id/delete", async (req, res) => {
 			const _id = req.params._id;
-			const query = {_id: new ObjectId(_id)};
+			const query = { _id: new ObjectId(_id) };
 			const result = await toyCollection.deleteOne(query);
 			res.send(result);
-		})
+		});
+		// Send a ping to confirm a successful connection
+		await client.db("admin").command({ ping: 1 });
+		console.log(
+			"Pinged your deployment. You successfully connected to MongoDB!"
+		);
 	} finally {
 		// Ensures that the client will close when you finish/error
 		// await client.close();
