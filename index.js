@@ -51,15 +51,11 @@ async function run() {
 
 		// get filtered toy by name
 		app.get("/allToys/filter=:filterData", async (req, res) => {
-			const textIndex = await toyCollection.createIndex({
-				a: 1,
-				"$**": "text",
-			});
 			const filter = req.params.filterData;
 			const result = await toyCollection
-				.find({ $text: { $search: "math" } })
+				.find({name: {$regex: filter}})
 				.toArray();
-			console.log(result);
+			res.send(result);
 		});
 
 		// Get subCategorize toys
