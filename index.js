@@ -34,6 +34,7 @@ async function run() {
 	try {
 		// Connect the client to the server	(optional starting in v4.7)
 		client.connect();
+
 		// Get all toys
 		app.get("/allToys", async (req, res) => {
 			const result = await toyCollection.find().toArray();
@@ -45,6 +46,27 @@ async function run() {
 			const _id = req.params._id;
 			const query = { _id: new ObjectId(_id) };
 			const result = await toyCollection.findOne(query);
+			res.send(result);
+		});
+
+		// get filtered toy by name
+		app.get("/allToys/filter=:filterData", async (req, res) => {
+			const textIndex = await toyCollection.createIndex({
+				a: 1,
+				"$**": "text",
+			});
+			const filter = req.params.filterData;
+			const result = await toyCollection
+				.find({ $text: { $search: "math" } })
+				.toArray();
+			console.log(result);
+		});
+
+		// Get subCategorize toys
+		app.get("/allToys/:subCategory", async (req, res) => {
+			const subCategory = req.params.subCategory;
+			const query = { subCategory: subCategory };
+			const result = await toyCollection.find(query).toArray();
 			res.send(result);
 		});
 
@@ -82,7 +104,6 @@ async function run() {
 				$set: updatedData,
 			});
 			res.send(result);
-			console.log(result);
 		});
 
 		// delete toy
